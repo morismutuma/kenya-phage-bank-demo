@@ -50,6 +50,45 @@
             <li><strong>AMR Linkage:</strong> Uses aggregated NDAR data to match phages to resistant pathogens.</li>
             <li><strong>Student Workflow:</strong> Upload → QC → Extract → ML → Dashboard → Repository.</li>
         </ul>
+        
+
+  <h2>Phage Metadata Submission</h2>
+  <form id="metadataForm">
+    <label for="phageID">Phage ID</label>
+    <input type="text" id="phageID" name="phageID" placeholder="Unique phage ID" required>
+
+<label for="gpsLocation">Isolation Location (GPS)</label>
+<input type="text" id="gpsLocation" name="gpsLocation" placeholder="Latitude, Longitude" required>
+
+<label for="hostSpecies">Host Species / Strain</label>
+<input type="text" id="hostSpecies" name="hostSpecies" placeholder="Bacterial species/strain" required>
+
+<label for="environment">Environment</label>
+<select id="environment" name="environment" required>
+  <option value="">Select Environment</option>
+  <option value="Soil">Soil</option>
+  <option value="River">River / Water</option>
+  <option value="Clinical">Clinical Sample</option>
+  <option value="Animal">Animal Sample</option>
+  <option value="Plant">Plant Sample</option>
+  <option value="Sewage">Sewage / Wastewater</option>
+</select>
+
+<label for="plaqueMorphology">Plaque Morphology</label>
+<input type="text" id="plaqueMorphology" name="plaqueMorphology" placeholder="e.g., clear, 2mm diameter" required>
+
+<label for="titer">Titer (PFU/mL)</label>
+<input type="text" id="titer" name="titer" placeholder="e.g., 3.2 × 10⁸" required>
+
+<label for="submitter">Submitter Name</label>
+<input type="text" id="submitter" name="submitter" placeholder="Your full name" required>
+
+<button type="submit">Submit Metadata</button>
+
+  </form>
+
+
+        
     </section>
 
     <footer>
