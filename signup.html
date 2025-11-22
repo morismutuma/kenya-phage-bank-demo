@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kenya Phage Bank - Signup & Metadata</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f5f5f5; }
+    h2 { color: #2c3e50; }
+    form { background: white; padding: 20px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+    label { display: block; margin: 10px 0 5px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-bottom: 15px; border-radius: 4px; border: 1px solid #ccc; }
+    button { background-color: #2980b9; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #3498db; }
+  </style>
+</head>
+<body>
+
+  <h2>Student Signup</h2>
+  <form id="signupForm">
+    <label for="fullName">Full Name</label>
+    <input type="text" id="fullName" name="fullName" placeholder="Enter your full name" required>
+
+```
+<label for="email">Email Address</label>
+<input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+<label for="institution">Institution</label>
+<input type="text" id="institution" name="institution" placeholder="Enter your institution" required>
+
+<label for="course">Course / Program</label>
+<input type="text" id="course" name="course" placeholder="Enter your course or program" required>
+
+<button type="submit">Sign Up</button>
+```
+
+  </form>
+
+  <h2>Phage Metadata Submission</h2>
+  <form id="metadataForm">
+    <label for="phageID">Phage ID</label>
+    <input type="text" id="phageID" name="phageID" placeholder="Unique phage ID" required>
+
+```
+<label for="gpsLocation">Isolation Location (GPS)</label>
+<input type="text" id="gpsLocation" name="gpsLocation" placeholder="Latitude, Longitude" required>
+
+<label for="hostSpecies">Host Species / Strain</label>
+<input type="text" id="hostSpecies" name="hostSpecies" placeholder="Bacterial species/strain" required>
+
+<label for="environment">Environment</label>
+<select id="environment" name="environment" required>
+  <option value="">Select Environment</option>
+  <option value="Soil">Soil</option>
+  <option value="River">River / Water</option>
+  <option value="Clinical">Clinical Sample</option>
+  <option value="Animal">Animal Sample</option>
+  <option value="Plant">Plant Sample</option>
+  <option value="Sewage">Sewage / Wastewater</option>
+</select>
+
+<label for="plaqueMorphology">Plaque Morphology</label>
+<input type="text" id="plaqueMorphology" name="plaqueMorphology" placeholder="e.g., clear, 2mm diameter" required>
+
+<label for="titer">Titer (PFU/mL)</label>
+<input type="text" id="titer" name="titer" placeholder="e.g., 3.2 × 10⁸" required>
+
+<label for="submitter">Submitter Name</label>
+<input type="text" id="submitter" name="submitter" placeholder="Your full name" required>
+
+<button type="submit">Submit Metadata</button>
+```
+
+  </form>
+
+</body>
+</html>
