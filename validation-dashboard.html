@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Researcher Validation Dashboard - Kenya National Phage Bank</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        /* Header Styles */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary), var(--dark));
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .researcher-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Main Layout */
+        .dashboard-container {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background-color: white;
+            padding: 1.5rem;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .nav-item.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .nav-item:hover:not(.active) {
+            background-color: var(--light);
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-pending { color: var(--warning); }
+        .stat-approved { color: var(--success); }
+        .stat-rejected { color: var(--danger); }
+        .stat-total { color: var(--secondary); }
+        
+        /* Submission Cards */
+        .submissions-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        
+        .submission-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--warning);
+        }
+        
+        .submission-card.approved {
+            border-left-color: var(--success);
+        }
+        
+        .submission-card.rejected {
+            border-left-color: var(--danger);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+        
+        .phage-id {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-approved { background-color: #d1edff; color: var(--secondary); }
+        .status-rejected { background-color: #f8d7da; color: #721c24; }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        .comparison-table th,
+        .comparison-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .comparison-table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+        
+        .match-good { color: var(--success); font-weight: bold; }
+        .match-fair { color: var(--warning); font-weight: bold; }
+        .match-poor { color: var(--danger); font-weight: bold; }
+        
+        .validation-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-approve { background-color: var(--success); color: white; }
+        .btn-reject { background-color: var(--danger); color: white; }
+        .btn-details { background-color: var(--secondary); color: white; }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* Model Performance Section */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .metric-trend {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        
+        .trend-up { background-color: #d4edda; color: #155724; }
+        .trend-down { background-color: #f8d7da; color: #721c24; }
+        
+        /* Charts placeholder */
+        .chart-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light);
+        }
+        
+        /* Comment Section */
+        .comment-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+        
+        .comment-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 0.5rem;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3 style="margin-bottom: 1.5rem; color: var(--primary);">Validation Dashboard</h3>
+            <div class="nav-item active">
+                <span>📋</span> Submission Queue
+            </div>
+            <div class="nav-item">
+                <span>📊</span> Model Performance
+            </div>
+            <div class="nav-item">
+                <span>🔍</span> Data Quality
+            </div>
+            <div class="nav-item">
+                <span>📈</span> Analytics
+            </div>
+            <div class="nav-item">
+                <span>⚙️</span> Settings
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="dashboard-header">
+                <div class="header-top">
+                    <h1>Researcher Validation Portal</h1>
+                    <div class="researcher-info">
+                        <span>Dr. Researcher Name</span>
+                        <div class="avatar">RN</div>
+                    </div>
+                </div>
+                <p>Review and validate student submissions with ML prediction comparisons</p>
+            </div>
+
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number stat-total">156</div>
+                    <div>Total Submissions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-pending">23</div>
+                    <div>Pending Review</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-approved">127</div>
+                    <div>Approved</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number stat-rejected">6</div>
+                    <div>Rejected</div>
+                </div>
+            </div>
+
+            <!-- Pending Submissions -->
+            <h2 style="margin-bottom: 1rem; color: var(--primary);">Pending Submissions</h2>
+            <div class="submissions-grid">
+                
+                <!-- Submission Card 1 -->
+                <div class="submission-card">
+                    <div class="card-header">
+                        <div class="phage-id">Phage_KE_2024_001</div>
+                        <div class="status-badge status-pending">Pending Review</div>
+                    </div>
+                    
+                    <p><strong>Student:</strong> Jane Wanjiku (University of Nairobi)</p>
+                    <p><strong>Host:</strong> Escherichia coli ST131 (XDR)</p>
+                    <p><strong>Isolation Source:</strong> Nairobi River</p>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Experimental Data</th>
+                                <th>ML Prediction</th>
+                                <th>Confidence</th>
+                                <th>Match Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Host Range</td>
+                                <td>E. coli, Salmonella</td>
+                                <td>E. coli (92%), Salmonella (78%)</td>
+                                <td>94%</td>
+                                <td class="match-good">✓ Good Match</td>
+                            </tr>
+                            <tr>
+                                <td>Burst Size</td>
+                                <td>150 PFU/cell</td>
+                                <td>120 PFU/cell</td>
+                                <td>87%</td>
+                                <td class="match-fair">~ Fair Match</td>
+                            </tr>
+                            <tr>
+                                <td>Life Cycle</td>
+                                <td>Lytic</td>
+                                <td>Lytic (95%)</td>
+                                <td>95%</td>
+                                <td class="match-good">✓ Good Match</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="validation-actions">
+                        <button class="btn btn-approve">✓ Approve Submission</button>
+                        <button class="btn btn-reject">✗ Request Revision</button>
+                        <button class="btn btn-details">View Full Details</button>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <textarea class="comment-input" placeholder="Add comments for the student..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Submission Card 2 -->
+                <div class="submission-card">
+                    <div class="card-header">
+                        <div class="phage-id">Phage_KE_2024_002</div>
+                        <div class="status-badge status-pending">Pending Review</div>
+                    </div>
+                    
+                    <p><strong>Student:</strong> David Omondi (Kenyatta University)</p>
+                    <p><strong>Host:</strong> Klebsiella pneumoniae (CRKP)</p>
+                    <p><strong>Isolation Source:</strong> Hospital Wastewater</p>
+                    
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Experimental Data</th>
+                                <th>ML Prediction</th>
+                                <th>Confidence</th>
+                                <th>Match Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Host Range</td>
+                                <td>K. pneumoniae only</td>
+                                <td>K. pneumoniae (88%), E. coli (45%)</td>
+                                <td>76%</td>
+                                <td class="match-poor">✗ Poor Match</td>
+                            </tr>
+                            <tr>
+                                <td>Depolymerase</td>
+                                <td>Not detected</td>
+                                <td>Predicted present (82%)</td>
+                                <td>82%</td>
+                                <td class="match-poor">✗ Poor Match</td>
+                            </tr>
+                            <tr>
+                                <td>Cluster</td>
+                                <td>Novel cluster</td>
+                                <td>Kp36-like (65%)</td>
+                                <td>65%</td>
+                                <td class="match-fair">~ Fair Match</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="validation-actions">
+                        <button class="btn btn-approve">✓ Approve Submission</button>
+                        <button class="btn btn-reject">✗ Request Revision</button>
+                        <button class="btn btn-details">View Full Details</button>
+                    </div>
+                    
+                    <div class="comment-section">
+                        <textarea class="comment-input" placeholder="Add comments for the student..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Performance Section -->
+            <h2 style="margin: 2rem 0 1rem 0; color: var(--primary);">ML Model Performance</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>Host Range Accuracy</h4>
+                    <div class="metric-value" style="color: var(--success);">87%</div>
+                    <div class="metric-trend trend-up">↑ +5% this month</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Burst Size R²</h4>
+                    <div class="metric-value" style="color: var(--warning);">0.72</div>
+                    <div class="metric-trend trend-up">↑ +0.08 this month</div>
+                </div>
+                <div class="metric-card">
+                    <h4>False Positive Rate</h4>
+                    <div class="metric-value" style="color: var(--danger);">12%</div>
+                    <div class="metric-trend trend-down">↓ -3% this month</div>
+                </div>
+                <div class="metric-card">
+                    <h4>Data Quality Score</h4>
+                    <div class="metric-value" style="color: var(--secondary);">8.4/10</div>
+                    <div class="metric-trend trend-up">↑ Improving</div>
+                </div>
+            </div>
+
+            <!-- Charts Placeholder -->
+            <div class="chart-container">
+                <p style="color: #666;">📊 Performance Trends Visualization - Integration with charts.js or similar library</p>
+            </div>
+
+            <!-- Recently Processed -->
+            <h2 style="margin: 2rem 0 1rem 0; color: var(--primary);">Recently Processed</h2>
+            <div class="submissions-grid">
+                <div class="submission-card approved">
+                    <div class="card-header">
+                        <div class="phage-id">Phage_KE_2024_045</div>
+                        <div class="status-badge status-approved">Approved</div>
+                    </div>
+                    <p><strong>Student:</strong> Mary Atieno | <strong>Host:</strong> Pseudomonas aeruginosa</p>
+                    <p><strong>ML Match:</strong> 94% | <strong>Reviewed by:</strong> Dr. Researcher Name</p>
+                </div>
+                
+                <div class="submission-card rejected">
+                    <div class="card-header">
+                        <div class="phage-id">Phage_KE_2024_044</div>
+                        <div class="status-badge status-rejected">Revisions Requested</div>
+                    </div>
+                    <p><strong>Student:</strong> James Kariuki | <strong>Host:</strong> Acinetobacter baumannii</p>
+                    <p><strong>Issue:</strong> Incomplete experimental data | <strong>Reviewed:</strong> 2 days ago</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Approve button functionality
+            document.querySelectorAll('.btn-approve').forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.submission-card');
+                    const phageId = card.querySelector('.phage-id').textContent;
+                    if (confirm(`Approve ${phageId}? This will move it to the approved database.`)) {
+                        card.style.opacity = '0.7';
+                        card.querySelector('.status-badge').className = 'status-badge status-approved';
+                        card.querySelector('.status-badge').textContent = 'Approved';
+                        // In real implementation, send API request to update status
+                    }
+                });
+            });
+
+            // Reject button functionality
+            document.querySelectorAll('.btn-reject').forEach(button => {
+                button.addEventListener('click', function() {
+                    const card = this.closest('.submission-card');
+                    const comment = card.querySelector('.comment-input').value;
+                    if (!comment) {
+                        alert('Please provide feedback comments before requesting revision.');
+                        return;
+                    }
+                    const phageId = card.querySelector('.phage-id').textContent;
+                    if (confirm(`Request revisions for ${phageId}?`)) {
+                        card.style.opacity = '0.7';
+                        card.querySelector('.status-badge').className = 'status-badge status-rejected';
+                        card.querySelector('.status-badge').textContent = 'Revisions Requested';
+                        // In real implementation, send API request to update status and comments
+                    }
+                });
+            });
+
+            // Navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    // In real implementation, load different dashboard sections
+                });
+            });
+        });
+    </script>
+</body>
+</html>
